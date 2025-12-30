@@ -664,7 +664,19 @@
                         <div class="command-box">cd dp-generator</div>
                         <div class="command-box"># sauvegardez le JSON dans project.json</div>
                         <div class="command-box" id="nodeCommand">GOOGLE_MAPS_API_KEY="VOTRE_CLE_API" node index.js project.json</div>
-                        
+
+                        <div class="api-key-group" style="margin-top:1rem;">
+                            <label for="apiUrl">API Génération (backend)</label>
+                            <div class="api-key-input">
+                                <input type="text" id="apiUrl" value="http://localhost:3001/generate">
+                                <button class="generate-btn" onclick="generatePdfFromApi()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
+                                    Générer le PDF
+                                </button>
+                            </div>
+                            <p style="font-size:0.85rem;color:var(--text-secondary);margin-top:0.5rem;">Lance le serveur Node local (commande ci-dessous) puis clique sur Générer.</p>
+                        </div>
+
                         <div class="api-key-group">
                             <label for="apiKey">Clé API Google Maps (optionnel)</label>
                             <div class="api-key-input">
@@ -782,6 +794,58 @@
             a.download = 'project.json';
             a.click();
             URL.revokeObjectURL(url);
+        }
+
+        async function generatePdfFromApi() {
+            const apiUrl = document.getElementById('apiUrl').value || 'http://localhost:3001/generate';
+            const data = collectData();
+
+            const payload = {
+                address: `${data.adresse}, ${data.codePostal} ${data.ville}`,
+                options: {
+                    clientName: data.client,
+                    azimut: data.azimut,
+                    puissance: data.puissanceKwc,
+                    surfacePanneaux: data.nombrePanneaux * 1.7, // approx
+                    surfacePlancher: data.surfacePlancher,
+                    materiau: data.typeToit
+                }
+            };
+
+            const btn = document.querySelector('.generate-btn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6-6-6M12 19h8"/></svg> En cours...`;
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur API ${response.status}`);
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'dossier-dp.pdf';
+                a.click();
+                URL.revokeObjectURL(url);
+
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> PDF téléchargé`;
+            } catch (e) {
+                alert(`Erreur: ${e.message}`);
+                btn.innerHTML = originalHTML;
+            } finally {
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }, 1500);
+            }
         }
 
         // Add event listeners to all form fields
