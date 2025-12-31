@@ -638,16 +638,22 @@
                     <div class="code-header">
                         <div class="code-header-left">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
-                            <h2>DP MAIRIE</h2>
+                            <h2>Génération du PDF</h2>
                         </div>
                     </div>
                     <div class="section-content">
-                        <p style="margin:0 0 1rem 0;color:var(--text-secondary);font-size:0.95rem;">
-                            Renseignez le formulaire puis cliquez pour générer et télécharger le PDF DP mairie.
+                        <div class="api-key-group">
+                            <label for="apiUrl">Endpoint backend</label>
+                            <div class="api-key-input">
+                                <input type="text" id="apiUrl" value="http://localhost:3001/generate">
+                            </div>
+                        </div>
+                        <p style="margin:1rem 0;color:var(--text-secondary);font-size:0.9rem;">
+                            Lancez le serveur Node en local (<code>npm run server</code> dans <code>dp-generator</code> avec la clé en variable d'environnement) puis cliquez pour générer et télécharger le PDF. Aucune clé n'est exposée dans la page.
                         </p>
-                        <button class="generate-btn" onclick="generatePdfFromApi()" style="margin-top:0.5rem;width:100%;">
+                        <button class="generate-btn" onclick="generatePdfFromApi()" style="margin-top:0.5rem;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
-                            Générer la DP MAIRIE
+                            Générer le PDF
                         </button>
                     </div>
                 </div>
@@ -694,10 +700,8 @@
             };
         }
 
-        const API_ENDPOINT = 'http://localhost:3001/generate';
-
         async function generatePdfFromApi() {
-            const apiUrl = API_ENDPOINT;
+            const apiUrl = document.getElementById('apiUrl').value || 'http://localhost:3001/generate';
             const data = collectData();
 
             const payload = {
