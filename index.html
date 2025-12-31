@@ -638,13 +638,9 @@
                     <div class="code-header">
                         <div class="code-header-left">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
-                            <h2>project.json</h2>
+                            <h2>Code JavaScript</h2>
                         </div>
-                        <button class="copy-btn" id="downloadBtn" style="margin-right: 0.5rem;" onclick="downloadJson()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m0 0l-4-4m4 4 4-4M4 5h16"/></svg>
-                            <span>Télécharger</span>
-                        </button>
-                        <button class="copy-btn" id="copyBtn" onclick="copyCode()">
+                        <button class="copy-btn" onclick="copyCode()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                             <span>Copier</span>
                         </button>
@@ -662,8 +658,7 @@
                     </div>
                     <div class="command-content">
                         <div class="command-box">cd dp-generator</div>
-                        <div class="command-box"># sauvegardez le JSON dans project.json</div>
-                        <div class="command-box" id="nodeCommand">GOOGLE_MAPS_API_KEY="VOTRE_CLE_API" node index.js project.json</div>
+                        <div class="command-box" id="nodeCommand">GOOGLE_MAPS_API_KEY="VOTRE_CLE_API" node index.js</div>
                         
                         <div class="api-key-group">
                             <label for="apiKey">Clé API Google Maps (optionnel)</label>
@@ -678,7 +673,7 @@
 
                         <div class="info-box">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                            <p>Enregistrez le fichier <strong>project.json</strong> généré ci-dessus, puis lancez la commande : il sera lu pour créer le PDF dans <strong>dp-generator/output/</strong>.</p>
+                            <p>Le PDF sera généré dans le dossier <strong>dp-generator/output/</strong> avec la nouvelle adresse du projet.</p>
                         </div>
                     </div>
                 </div>
@@ -712,8 +707,9 @@
         const apiKeyInput = document.getElementById('apiKey');
         const nodeCommand = document.getElementById('nodeCommand');
 
-        function collectData() {
-            return {
+        // Generate formatted code
+        function generateCode() {
+            const data = {
                 societe: fields.societe.value || 'QUALIWATT',
                 slogan: fields.slogan.value || 'Notre energie a votre service',
                 client: fields.client.value || 'NOUVEAU CLIENT',
@@ -728,27 +724,68 @@
                 surfaceTerrain: parseInt(fields.surfaceTerrain.value) || 500,
                 surfacePlancher: parseInt(fields.surfacePlancher.value) || 120
             };
-        }
 
-        // Generate formatted code
-        function generateCode() {
-            const data = collectData();
-            codeOutput.textContent = JSON.stringify(data, null, 2);
+            const code = `<span class="code-keyword">const</span> <span class="code-property">sampleProject</span> = {
+  <span class="code-property">societe</span>: <span class="code-string">'${data.societe}'</span>,
+  <span class="code-property">slogan</span>: <span class="code-string">'${data.slogan}'</span>,
+  <span class="code-property">client</span>: <span class="code-string">'${data.client}'</span>,
+  <span class="code-property">adresse</span>: <span class="code-string">'${data.adresse}'</span>,
+  <span class="code-property">codePostal</span>: <span class="code-string">'${data.codePostal}'</span>,
+  <span class="code-property">ville</span>: <span class="code-string">'${data.ville}'</span>,
+  <span class="code-property">nombrePanneaux</span>: <span class="code-number">${data.nombrePanneaux}</span>,
+  <span class="code-property">puissanceKwc</span>: <span class="code-number">${data.puissanceKwc}</span>,
+  <span class="code-property">orientation</span>: <span class="code-string">'${data.orientation}'</span>,
+  <span class="code-property">azimut</span>: <span class="code-number">${data.azimut}</span>,
+  <span class="code-property">typeToit</span>: <span class="code-string">'${data.typeToit}'</span>,
+  <span class="code-property">surfaceTerrain</span>: <span class="code-number">${data.surfaceTerrain}</span>,
+  <span class="code-property">surfacePlancher</span>: <span class="code-number">${data.surfacePlancher}</span>
+};`;
+
+            codeOutput.innerHTML = code;
         }
 
         // Update command with API key
         function updateCommand() {
             const apiKey = apiKeyInput.value || 'VOTRE_CLE_API';
-            nodeCommand.textContent = `GOOGLE_MAPS_API_KEY="${apiKey}" node index.js project.json`;
+            nodeCommand.textContent = `GOOGLE_MAPS_API_KEY="${apiKey}" node index.js`;
         }
 
         // Copy code to clipboard
         function copyCode() {
-            const data = collectData();
-            const json = JSON.stringify(data, null, 2);
+            const data = {
+                societe: fields.societe.value || 'QUALIWATT',
+                slogan: fields.slogan.value || 'Notre energie a votre service',
+                client: fields.client.value || 'NOUVEAU CLIENT',
+                adresse: fields.adresse.value || '10 Rue Exemple',
+                codePostal: fields.codePostal.value || '75001',
+                ville: fields.ville.value || 'Paris',
+                nombrePanneaux: parseInt(fields.nombrePanneaux.value) || 12,
+                puissanceKwc: parseFloat(fields.puissanceKwc.value) || 6,
+                orientation: fields.orientation.value || 'SUD',
+                azimut: parseInt(fields.azimut.value) || 180,
+                typeToit: fields.typeToit.value || 'Tuiles',
+                surfaceTerrain: parseInt(fields.surfaceTerrain.value) || 500,
+                surfacePlancher: parseInt(fields.surfacePlancher.value) || 120
+            };
 
-            const btn = document.getElementById('copyBtn');
-            navigator.clipboard.writeText(json).then(() => {
+            const plainCode = `const sampleProject = {
+  societe: '${data.societe}',
+  slogan: '${data.slogan}',
+  client: '${data.client}',
+  adresse: '${data.adresse}',
+  codePostal: '${data.codePostal}',
+  ville: '${data.ville}',
+  nombrePanneaux: ${data.nombrePanneaux},
+  puissanceKwc: ${data.puissanceKwc},
+  orientation: '${data.orientation}',
+  azimut: ${data.azimut},
+  typeToit: '${data.typeToit}',
+  surfaceTerrain: ${data.surfaceTerrain},
+  surfacePlancher: ${data.surfacePlancher}
+};`;
+
+            navigator.clipboard.writeText(plainCode).then(() => {
+                const btn = document.querySelector('.copy-btn');
                 btn.classList.add('copied');
                 btn.querySelector('span').textContent = 'Copié !';
                 setTimeout(() => {
@@ -761,7 +798,7 @@
         // Copy full command
         function copyFullCommand() {
             const apiKey = apiKeyInput.value || 'VOTRE_CLE_API';
-            const command = `cd dp-generator && GOOGLE_MAPS_API_KEY="${apiKey}" node index.js project.json`;
+            const command = `cd dp-generator && GOOGLE_MAPS_API_KEY="${apiKey}" node index.js`;
             
             navigator.clipboard.writeText(command).then(() => {
                 const btn = document.querySelector('.generate-btn');
@@ -771,17 +808,6 @@
                     btn.innerHTML = originalHTML;
                 }, 2000);
             });
-        }
-
-        function downloadJson() {
-            const data = collectData();
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'project.json';
-            a.click();
-            URL.revokeObjectURL(url);
         }
 
         // Add event listeners to all form fields
